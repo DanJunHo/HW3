@@ -28,3 +28,13 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### 이하는 내가 새로 추가한 내용들 ###
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+
+### Java 컴파일 결과물 ###
+out/
+*.class
