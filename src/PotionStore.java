@@ -41,7 +41,7 @@ public class PotionStore {
         int count = sc.nextInt();
         if (count <= 0) {
             System.out.println("1 이상의 숫자를 입력하세요.");
-            buyPotion(player, sc);
+            return;
         }
         if (potion[itemIndex].gold * count > player.gold) { // 1. 구입할 포션의 번호와 개수를 묻는다. 플레이어의 보유골드가 부족하면 오류문구를 띄운다.
             System.out.println("보유골드가 부족합니다.");
@@ -69,33 +69,34 @@ public class PotionStore {
     }
 
     void sellPotion(Player player, Scanner sc) {
-        player.inventory.open(player, sc);
+        player.inventory.open(player);
         System.out.println("판매할 포션을 입력하세요");
         int itemNum =  sc.nextInt();
         int itemIndex = itemNum - 1;
 
         if (player.inventory.slots[itemIndex].isEmpty()) {
             System.out.println("해당 슬롯은 비어있습니다.");
-            return;
         }
         else if(player.inventory.slots[itemIndex].isWeapon()) {
             System.out.println("포션만 판매할 수 있습니다.");
-            return;
         }
         else if(player.inventory.slots[itemIndex].isPotion()) {
             System.out.println("판매할 포션의 개수를 입력해주세요");
             int count = sc.nextInt();
+            // 보유 개수가 입력한 수보다 적은 경우
             if(count > player.inventory.slots[itemIndex].count) {
                 System.out.println("아이템 보유량이 부족합니다.");
             }
+            // 보유 개수가 입력 수 이상인 경우
             else {
                 if (player.inventory.slots[itemIndex].count == count) {
-                    player.gold = player.gold - potion[itemIndex].gold * count;
+                    player.gold = player.gold + player.inventory.slots[itemIndex].potion.gold * count;
+                    System.out.println(player.inventory.slots[itemIndex].potion.name + "을(를) 판매하였습니다.");    // clear()먼저 사용 후에 쓰면 null오류 뜸
                     player.inventory.slots[itemIndex].clear();
                 }
                 else {
                     player.inventory.slots[itemIndex].count = player.inventory.slots[itemIndex].count - count;
-                    player.gold = player.gold - potion[itemIndex].gold * count;
+                    player.gold = player.gold + player.inventory.slots[itemIndex].potion.gold * count;
                     System.out.println(player.inventory.slots[itemIndex].potion.name + "을(를) 판매하였습니다. (현재수량: " + player.inventory.slots[itemIndex].count + ")");
                 }
             }

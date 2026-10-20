@@ -68,7 +68,7 @@ public class WeaponStore {
     }
 
     void sellWeapon(Player player, Scanner sc) {
-        player.inventory.open(player, sc);
+        player.inventory.open(player);
         System.out.println("판매할 무기의 번호를 입력하세요");
         int itemNum = sc.nextInt();
         int itemIndex = itemNum - 1;
@@ -85,10 +85,15 @@ public class WeaponStore {
             return;
         }
         else if (player.inventory.slots[itemIndex].isWeapon()) {
-            player.gold = player.gold - player.inventory.slots[itemIndex].weapon.gold;
-            System.out.println(player.inventory.slots[itemIndex].weapon.name + "을 판매하였습니다.");
-            player.inventory.slots[itemIndex].clear();
-            return;
+            if (player.inventory.slots[itemIndex].weapon == player.equipWeapon) {
+                System.out.println("현재 장착중인 무기는 판매할 수 없습니다.");
+            }
+            else {
+                player.gold = player.gold - player.inventory.slots[itemIndex].weapon.gold;
+                System.out.println(player.inventory.slots[itemIndex].weapon.name + "을 판매하였습니다.");
+                player.inventory.slots[itemIndex].clear();
+                return;
+            }
         }
 
 

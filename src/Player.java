@@ -14,6 +14,8 @@ public class Player {
     int armor;
     int gold = 100000;
 
+    int equipNum = -1;   // 장착중인 무기의 인덱스를 표시하기 위함. 무기 해제 시 필요.
+
     int potionCount = 4;
 
     Inventory inventory;
@@ -158,16 +160,16 @@ public class Player {
         // 스킬획득
         if (level == 10) {
             this.skill[0].availability = true;
-            System.out.println(skill[0].name + " 을(를) 획득하였습니다!");
+            System.out.println(skill[0].name + " 스킬을 획득하였습니다!");
         } else if (level == 20) {
             this.skill[1].availability = true;
-            System.out.println(skill[1].name + " 을(를) 획득하였습니다!");
+            System.out.println(skill[1].name + " 스킬을 획득하였습니다!");
             if (clssNum == 1) {
                 System.out.println(skill[1].name + " 에 의해 영구적으로 공격력이 증가합니다! (공격력 증가: +20)");
             }
         } else if (level == 30) {
             this.skill[2].availability = true;
-            System.out.println(skill[2].name + " 을(를) 획득하였습니다!");
+            System.out.println(skill[2].name + " 스킬을 획득하였습니다!");
         }
     }
 
@@ -223,8 +225,10 @@ public class Player {
             if (invenIndex >= 0 && invenIndex < 30) {
                 if (this.inventory.slots[invenIndex].isEmpty()) {
                     System.out.println("해당 슬롯은 비어있습니다.");
+                    return;
                 } else if (this.inventory.slots[invenIndex].isPotion()) {
                     System.out.println("해당 아이템은 무기가 아닙니다.");
+                    return;
                 } else if (this.inventory.slots[invenIndex].isWeapon()) {
                     // 무기 레벨이 플레이어 레벨보다 높은 경우
                     if (this.inventory.slots[invenIndex].weapon.level > this.level) {
@@ -233,7 +237,9 @@ public class Player {
                     }
                     // 플레이어 레벨이 무기 레벨과 같거나 높은 경우
                     else {
-                        this.equipWeapon = this.inventory.slots[invenIndex].weapon;
+                        this.equipWeapon = this.inventory.slots[invenIndex].weapon; // 해당 슬롯의 무기를 장착중인 무기 객체가 됨.
+                        this.inventory.slots[invenIndex].equipped = true;   // 해당 슬롯의 상태가 장착중으로 변경
+                        this.equipNum = invenIndex;
                         this.attack = this.attack + this.equipWeapon.attack;
                         System.out.println(this.equipWeapon.name + "을 장착하였습니다.(공격력 증가 +" + this.equipWeapon.attack + ")");
                         return;
@@ -251,6 +257,8 @@ public class Player {
             System.out.println("현재 장착중인 무기가 없습니다.");
         } else {
             this.attack = this.attack - equipWeapon.attack;
+            this.inventory.slots[this.equipNum].equipped = false;
+            this.equipNum = - 1;
             System.out.println(equipWeapon.name + " 을(를) 장착 해제하였습니다.");
             equipWeapon = null;
         }
@@ -259,21 +267,8 @@ public class Player {
     boolean usePotion(boolean inBattle, Scanner sc) {  // 반환값이 true이면 플레이어 턴 반복, false면 몬스터 턴으로 넘어감.
         if (inBattle == true) {
             while (true) {
-                System.out.println("================= 인 벤 토 리 =================");
-                for (int i = 0; i < this.inventory.slots.length; i++) {
-                    System.out.print((i + 1) + ". ");
-
-                    if (this.inventory.slots[i].isEmpty()) {
-                        System.out.println("(비어있음)");
-                    }
-                    else if (this.inventory.slots[i].equipped == false && this.inventory.slots[i].isWeapon()) {
-                        System.out.println(this.inventory.slots[i].weapon.name + "(착용레벨: " + this.inventory.slots[i].weapon.level + " /공격력:  " + this.inventory.slots[i].weapon.attack + ")");
-                    } else if (this.inventory.slots[i].isPotion()) {
-                        System.out.println(this.inventory.slots[i].potion.name + "(회복량: " + this.inventory.slots[i].potion.hpUp + " /개수: " + this.inventory.slots[i].count + ")");
-                    }
-                }
-                System.out.println("보유골드: " + this.gold);
-                System.out.println("=============================================");
+                // 전투 중 포션사용 선택 시 인벤토리를 띄운다.
+                this.inventory.open(this);
                 System.out.println("사용할 포션의 번호를 입력하세요 (0. 뒤로가기)");
 
                 int invenNum = sc.nextInt();
@@ -327,8 +322,9 @@ public class Player {
         }
         // 싸움중이 아닌경우. 뒤로가기 누르면 false반환
         else {
-            System.out.println("던전에 있지 않은경우");
             while (true) {
+                // 전투중이 아닌 경우 인벤토리에서 포션 사용을 선택할 수 있다.
+                this.inventory.open(this);
                 System.out.println("사용할 포션의 번호를 입력하세요 (0. 뒤로가기)");
 
                 int invenNum = sc.nextInt();

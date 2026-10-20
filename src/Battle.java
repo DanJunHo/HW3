@@ -27,6 +27,8 @@ public class Battle {
             if (player.hp == 0) {
                 System.out.println(player.name + " 이(가) " + monster.name + " 에 의해 사망하였습니다.");
                 player.deathPenalty();
+                player.hp = player.maxHp / 10;
+                monster.hp = monster.maxHp;
                 return;
             }
             if (monster.hp == 0) {

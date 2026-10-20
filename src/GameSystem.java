@@ -168,7 +168,8 @@ public class GameSystem {
                 player.showStat();
             }
             else if (choice == 2) { // 2. 인벤토리 열기
-                player.inventory.open(player, sc);
+                player.inventory.open(player);
+                player.inventory.invenMenu(player, sc);
             }
             else if (choice == 3) { // 3. 상점 이동
                 System.out.println("이동하실 상점을 선택하세요.\n1. 무기상점\n2. 소모품상점\n3. 뒤로가기");
@@ -235,7 +236,8 @@ public class GameSystem {
                 }
             }
             else if (choice2 == 2) {
-                player.inventory.open(player, sc);
+                player.inventory.open(player);
+                player.inventory.invenMenu(player, sc);
             }
             else if (choice2 == 3) {
                 player.showStat();
